@@ -1,33 +1,32 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, Text, FlatList} from 'react-native';
+import React, { useState } from "react";
+import {StyleSheet, Text, FlatList, StatusBar} from 'react-native';
 import {observer} from 'mobx-react-lite';
 import {useAppStore, Task as TaskType} from './stores/appStore';
-//import * as NavigationBar from 'expo-navigation-bar';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ButtonsContainer from './components/ButtonsContainer';
 import Task from './components/Task';
 import TaskModal from './components/TaskModal'
+import type {StatusBarStyle} from 'react-native';
+import { ColorValue } from "react-native/Libraries/StyleSheet/StyleSheet";
 
 type RenderTaskProps = {
   item: TaskType,
   index: number
 };
 
+type TStatusBarStyleData ={
+  statusBarStyle : StatusBarStyle,
+  backgroundColor: ColorValue
+}
+
+const STYLES = ['default', 'dark-content', 'light-content'] as StatusBarStyle[];
+
 const App = observer(() => {
   const store = useAppStore();
-
-  /*useEffect(() => {
-    (async () => {
-      try {
-        await Promise.all([
-          NavigationBar.setBackgroundColorAsync('black'),
-          NavigationBar.setButtonStyleAsync('dark')
-        ])
-      } catch (e) {
-        alert(e);
-      }
-    })();
-  }, []);*/
+  const [statusBarStyleData, setStatusBarStyle] = useState<TStatusBarStyleData>({
+    backgroundColor: "#000000",
+    statusBarStyle: STYLES[0],
+  });
 
   const renderTask = ({item, index}: RenderTaskProps) => {
     return (
@@ -41,6 +40,11 @@ const App = observer(() => {
 
   return (
     <SafeAreaView style={styles.appContainer}>
+      <StatusBar
+        animated={true}
+        backgroundColor={statusBarStyleData?.backgroundColor}
+        barStyle={statusBarStyleData?.statusBarStyle}
+      />
       <Text style={styles.appTitle}>Todos For Today</Text>
       <FlatList
         style={styles.flatList}
@@ -49,7 +53,6 @@ const App = observer(() => {
         keyExtractor={getKeyExtractor}
       />
       <ButtonsContainer/>
-      {/*<StatusBar style='light'/>*/}
       <TaskModal/>
     </SafeAreaView>
   );
